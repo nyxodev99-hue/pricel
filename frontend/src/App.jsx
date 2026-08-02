@@ -31,10 +31,16 @@ export default function App() {
   useEffect(() => {
     const disconnect = connectRealtime((msg) => {
       setConnected(true);
-      if (msg.type === 'pixel_update') {
+  if (msg.type === 'pixel_update') {
         pixelsRef.current.set(`${msg.pixel.x},${msg.pixel.y}`, msg.pixel);
         const canvas = document.querySelector('canvas.canvas-board');
         canvas && canvas.__redraw && canvas.__redraw();
+        // Keep the inspector in sync if it's showing this exact pixel
+        setSelectedPixel((prev) =>
+          prev && prev.x === msg.pixel.x && prev.y === msg.pixel.y
+            ? { ...msg.pixel, is_empty: false }
+            : prev
+        );
       }
       if (msg.type === 'achievements_unlocked' && msg.userId === user?.id) {
         msg.achievements.forEach((a) => pushToast(`🏆 Succès débloqué : ${a.name}`));
