@@ -28,7 +28,7 @@ new_sqlite_classes = ["CanvasEconomy"]
 [[d1_databases]]
 binding = "DB"
 database_name = "pixel-canvas-db"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "75d56a11-98a4-4c56-ba10-f14bc2f2d3b6"
 
 # Monthly event check. Cron itself just asks the engine to evaluate every
 # active event whose schedule matches - see src/index.js `scheduled()`.
