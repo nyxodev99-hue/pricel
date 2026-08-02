@@ -1,0 +1,41 @@
+name = "pixel-canvas-backend"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ---------------------------------------------------------------------------
+# Durable Object: holds the entire 1000x1000 pixel grid + the live WebSocket
+# hub. A single global instance ("main") is used so that all pixel writes
+# and the credit transactions tied to them are naturally serialized by the
+# Durable Object's single-threaded execution model. This is what gives us
+# transactional safety across "pixel ownership" (stored in the DO's own
+# SQLite storage) and "user credits" (stored in D1) without a distributed
+# transaction system.
+# ---------------------------------------------------------------------------
+[[durable_objects.bindings]]
+name = "CANVAS"
+class_name = "CanvasEconomy"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["CanvasEconomy"]
+
+# ---------------------------------------------------------------------------
+# D1: users, achievements, events. Anything that is NOT the pixel grid.
+# Create with: wrangler d1 create pixel-canvas-db
+# Then paste the returned database_id below.
+# ---------------------------------------------------------------------------
+[[d1_databases]]
+binding = "DB"
+database_name = "pixel-canvas-db"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+# Monthly event check. Cron itself just asks the engine to evaluate every
+# active event whose schedule matches - see src/index.js `scheduled()`.
+[triggers]
+crons = ["0 0 1 * *"]
+
+[vars]
+ENVIRONMENT = "production"
+FREE_CREDITS = "100"
+CANVAS_SIZE = "1000"
